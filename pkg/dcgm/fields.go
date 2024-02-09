@@ -60,13 +60,15 @@ func WatchFields(gpuId uint, fieldsGroup FieldHandle, groupName string) (groupId
 	if err != nil {
 		return
 	}
-
+	// fmt.Println("\tWatchFields - CreateGroup", group, err)
 	err = AddToGroup(group, gpuId)
 	if err != nil {
 		return
 	}
+	// fmt.Println("\tWatchFields - AddToGroup", err)
 
 	result := C.dcgmWatchFields(handle.handle, group.handle, fieldsGroup.handle, C.longlong(defaultUpdateFreq), C.double(defaultMaxKeepAge), C.int(defaultMaxKeepSamples))
+	// fmt.Println("\tWatchFields - result", result, errorString(result))
 	if err = errorString(result); err != nil {
 		return groupId, fmt.Errorf("Error watching fields: %s", err)
 	}

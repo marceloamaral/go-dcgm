@@ -26,10 +26,10 @@ func (p PerfState) String() string {
 }
 
 type UtilizationInfo struct {
-	GPU     int64 // %
-	Memory  int64 // %
-	Encoder int64 // %
-	Decoder int64 // %
+	GPU     float64 // %
+	Memory  float64 // %
+	Encoder float64 // %
+	Decoder float64 // %
 }
 
 type ECCErrorsInfo struct {
@@ -95,10 +95,14 @@ func latestValuesForDevice(gpuId uint) (status DeviceStatus, err error) {
 	deviceFields := make([]Short, fieldsCount)
 	deviceFields[pwr] = C.DCGM_FI_DEV_POWER_USAGE
 	deviceFields[temp] = C.DCGM_FI_DEV_GPU_TEMP
-	deviceFields[sm] = C.DCGM_FI_DEV_GPU_UTIL
-	deviceFields[mem] = C.DCGM_FI_DEV_MEM_COPY_UTIL
-	deviceFields[enc] = C.DCGM_FI_DEV_ENC_UTIL
-	deviceFields[dec] = C.DCGM_FI_DEV_DEC_UTIL
+	// deviceFields[sm] = C.DCGM_FI_DEV_GPU_UTIL
+	deviceFields[sm] = C.DCGM_FI_PROF_SM_ACTIVE // I changed the metric for debug purpose
+	// deviceFields[mem] = C.DCGM_FI_DEV_MEM_COPY_UTIL
+	deviceFields[mem] = C.DCGM_FI_PROF_DRAM_ACTIVE  // I changed the metric
+	deviceFields[enc] = C.DCGM_FI_PROF_SM_OCCUPANCY // I changed the metric for debug purpose, this is not encode
+	// deviceFields[enc] = C.DCGM_FI_DEV_ENC_UTIL
+	// deviceFields[dec] = C.DCGM_FI_DEV_DEC_UTIL
+	deviceFields[dec] = C.DCGM_FI_PROF_PIPE_TENSOR_ACTIVE
 	deviceFields[smClock] = C.DCGM_FI_DEV_SM_CLOCK
 	deviceFields[memClock] = C.DCGM_FI_DEV_MEM_CLOCK
 	deviceFields[bar1Used] = C.DCGM_FI_DEV_BAR1_USED
@@ -134,10 +138,10 @@ func latestValuesForDevice(gpuId uint) (status DeviceStatus, err error) {
 	power := values[pwr].Float64()
 
 	gpuUtil := UtilizationInfo{
-		GPU:     values[sm].Int64(),
-		Memory:  values[mem].Int64(),
-		Encoder: values[enc].Int64(),
-		Decoder: values[dec].Int64(),
+		GPU:     values[sm].Float64(),
+		Memory:  values[mem].Float64(),
+		Encoder: values[enc].Float64(),
+		Decoder: values[dec].Float64(),
 	}
 
 	memory := MemoryInfo{

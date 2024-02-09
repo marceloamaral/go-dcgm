@@ -30,6 +30,10 @@ func CreateGroup(groupName string) (goGroupId GroupHandle, err error) {
 		return goGroupId, fmt.Errorf("Error creating group: %s", err)
 	}
 
+	// fmt.Println("\t\tCreateGroup cGroupId", cGroupId)
+	// fmt.Println("\t\tCreateGroup result", result)
+	// fmt.Println("\t\tCreateGroup err", errorString(result))
+
 	goGroupId = GroupHandle{cGroupId}
 	return
 }
@@ -50,6 +54,8 @@ func NewDefaultGroup(groupName string) (GroupHandle, error) {
 
 func AddToGroup(groupId GroupHandle, gpuId uint) (err error) {
 	result := C.dcgmGroupAddDevice(handle.handle, groupId.handle, C.uint(gpuId))
+	// fmt.Println("\t\tAddToGroup groupId", groupId, "gpuId", gpuId)
+	// fmt.Println("\t\tAddToGroup result", result, errorString(result))
 	if err = errorString(result); err != nil {
 		return fmt.Errorf("Error adding GPU %v to group: %s", gpuId, err)
 	}
